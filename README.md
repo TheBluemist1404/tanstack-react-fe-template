@@ -18,6 +18,16 @@ To build this application for production:
 yarn build
 ```
 
+## Toast Notifications
+
+The global `react-hot-toast` toaster is already mounted. Trigger notifications from any component:
+
+```tsx
+import { toast } from 'react-hot-toast'
+
+toast.success('Saved successfully')
+```
+
 ## Styling
 
 This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
