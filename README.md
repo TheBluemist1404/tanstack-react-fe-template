@@ -133,6 +133,8 @@ GitHub Actions checks pull requests and `main` with:
 
 Once a committed pnpm lockfile exists, CI uses frozen installs for reproducibility.
 
+For repositories created from this template, configure the recommended default-branch protection described in [RULESET.md](RULESET.md).
+
 ## Environment Variables
 
 ```env
