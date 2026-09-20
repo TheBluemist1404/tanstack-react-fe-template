@@ -2,8 +2,11 @@ node_modules
 .DS_Store
 dist
 dist-ssr
+coverage
 *.local
 .env
+.env.*
+!.env.example
 .nitro
 .tanstack
 .wrangler
@@ -11,3 +14,4 @@ dist-ssr
 .vinxi
 __unconfig*
 todos.json
+pnpm-debug.log*

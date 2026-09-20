@@ -1,6 +1,6 @@
 import { type QueryKey, queryOptions } from "@tanstack/react-query";
 import type { AxiosRequestConfig } from "axios";
-import { httpClient } from "@/lib/http-client";
+import { httpClient } from "@/lib/http/client";
 
 export function createHttpQueryOptions<TData>(
 	queryKey: QueryKey,

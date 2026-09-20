@@ -14,11 +14,9 @@ function RootComponent() {
 	return (
 		<>
 			<Outlet />
-			{import.meta.env.VITE_IS_PRODUCTION === "false" && (
+			{import.meta.env.DEV && (
 				<TanStackDevtools
-					config={{
-						position: "bottom-right",
-					}}
+					config={{ position: "bottom-right" }}
 					plugins={[
 						{
 							name: "TanStack Query",
