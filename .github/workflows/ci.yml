@@ -4,10 +4,12 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches:
+      - main
+      - chore/modernize-template
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -19,6 +21,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'push' && github.ref_name || github.event.pull_request.head.sha }}
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -48,10 +52,14 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Upload generated lockfile
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: pnpm-lockfile
-          path: pnpm-lock.yaml
-          if-no-files-found: ignore
+      - name: Commit generated lockfile
+        if: github.event_name == 'push' && github.ref_name == 'chore/modernize-template'
+        run: |
+          git add pnpm-lock.yaml
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: add pnpm lockfile"
+          git push origin HEAD:chore/modernize-template
