@@ -10,9 +10,9 @@ export interface HttpInterceptorHandlers {
 	onRequest?: (
 		config: InternalAxiosRequestConfig,
 	) => MaybePromise<InternalAxiosRequestConfig>;
-	onRequestError?: (error: unknown) => MaybePromise<InternalAxiosRequestConfig>;
+	onRequestError?: (error: unknown) => unknown;
 	onResponse?: (response: AxiosResponse) => MaybePromise<AxiosResponse>;
-	onResponseError?: (error: unknown) => MaybePromise<AxiosResponse>;
+	onResponseError?: (error: unknown) => unknown;
 }
 
 export const httpClient = axios.create({
@@ -22,19 +22,17 @@ export const httpClient = axios.create({
 	},
 });
 
-const reject = (error: unknown) => Promise.reject(error);
-
 export function registerHttpInterceptors(
-	handlers: HttpInterceptorHandlers = {},
+	handlers: HttpInterceptorHandlers,
 	client: AxiosInstance = httpClient,
 ) {
 	const requestInterceptorId = client.interceptors.request.use(
-		handlers.onRequest ?? ((config) => config),
-		handlers.onRequestError ?? reject,
+		handlers.onRequest,
+		handlers.onRequestError,
 	);
 	const responseInterceptorId = client.interceptors.response.use(
-		handlers.onResponse ?? ((response) => response),
-		handlers.onResponseError ?? reject,
+		handlers.onResponse,
+		handlers.onResponseError,
 	);
 
 	return () => {
@@ -42,5 +40,3 @@ export function registerHttpInterceptors(
 		client.interceptors.response.eject(responseInterceptorId);
 	};
 }
-
-registerHttpInterceptors();
