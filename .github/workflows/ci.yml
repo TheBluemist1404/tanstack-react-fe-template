@@ -4,12 +4,10 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches:
-      - main
-      - chore/modernize-template
+    branches: [main]
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -20,9 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'push' && github.ref_name || github.event.pull_request.head.sha }}
+        uses: actions/checkout@v7
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -31,17 +27,19 @@ jobs:
           run_install: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
         env:
           HUSKY: 0
 
-      - name: Normalize with Biome
-        run: pnpm exec biome check --write .
+      - name: Biome
+        run: pnpm exec biome ci --reporter=github .
 
       - name: Typecheck
         run: pnpm typecheck
@@ -51,15 +49,3 @@ jobs:
 
       - name: Build
         run: pnpm build
-
-      - name: Commit generated files
-        if: github.event_name == 'push' && github.ref_name == 'chore/modernize-template'
-        run: |
-          git add -A
-          if git diff --cached --quiet; then
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore: normalize template files"
-          git push origin HEAD:chore/modernize-template
